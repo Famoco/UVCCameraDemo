@@ -33,8 +33,8 @@ tasks.withType(JavaCompile) {
 
 task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
 	println('executing ndkBuild')
-	def ndkBuildingDir = project.plugins.findPlugin('com.android.library').sdkHandler.getNdkFolder().absolutePath
-	def ndkBuildPath = ndkBuildingDir
+	def ndkBuildingDir = project.android.ndkDirectory.absolutePath
+    def ndkBuildPath = ndkBuildingDir
 	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 		ndkBuildPath = ndkBuildingDir + '/ndk-build.cmd'
 	} else {
