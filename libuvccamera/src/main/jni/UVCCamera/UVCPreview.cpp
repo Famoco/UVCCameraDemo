@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <linux/time.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include "utilbase.h"
 #include "UVCPreview.h"
 #include "libuvc_internal.h"
@@ -499,6 +500,11 @@ void UVCPreview::do_preview(uvc_stream_ctrl_t *ctrl) {
 
 	uvc_frame_t *frame = NULL;
 	uvc_frame_t *frame_mjpeg = NULL;
+	const char *path_format = "/sdcard/Pictures/file-%04d.jpg";
+	char path[1024];
+	int fd;
+	static int counter = 0;
+
 	uvc_error_t result = uvc_start_streaming_bandwidth(
 		mDeviceHandle, ctrl, uvc_preview_frame_callback, (void *)this, requestBandwidth, 0);
 
@@ -524,6 +530,11 @@ void UVCPreview::do_preview(uvc_stream_ctrl_t *ctrl) {
                         LOGI("Streaming MJPEG: frame_mjpeg->frame_format = UVC_FRAME_FORMAT_RGBX");
                     else
                         LOGI("Streaming MJPEG: frame_mjpeg->frame_format = ?");
+
+                    sprintf(path, path_format, ++counter);
+                    fd = open(path, O_CREAT | O_RDWR);
+                    write(fd, frame_mjpeg->data, frame_mjpeg->data_bytes);
+                    close(fd);
 
 					result = uvc_mjpeg2yuyv(frame_mjpeg, frame);   // MJPEG => yuyv
 					recycle_frame(frame_mjpeg);
