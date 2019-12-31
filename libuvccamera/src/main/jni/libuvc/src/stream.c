@@ -942,7 +942,7 @@ static void _uvc_stream_callback(struct libusb_transfer *transfer) {
 	case LIBUSB_TRANSFER_CANCELLED:
 	case LIBUSB_TRANSFER_ERROR:
 		UVC_DEBUG("not retrying transfer, status = %d", transfer->status);
-//		MARK("not retrying transfer, status = %d", transfer->status);
+		MARK("not retrying transfer, status = %d", transfer->status);
 //		_uvc_delete_transfer(transfer);
 		resubmit = 0;
 		break;
@@ -950,7 +950,7 @@ static void _uvc_stream_callback(struct libusb_transfer *transfer) {
 	case LIBUSB_TRANSFER_STALL:
 	case LIBUSB_TRANSFER_OVERFLOW:
 		UVC_DEBUG("retrying transfer, status = %d", transfer->status);
-//		MARK("retrying transfer, status = %d", transfer->status);
+		MARK("retrying transfer, status = %d", transfer->status);
 		break;
 	}
 
@@ -1490,6 +1490,8 @@ uvc_error_t uvc_stream_start_bandwidth(uvc_stream_handle_t *strmh,
 			transfer = libusb_alloc_transfer(packets_per_transfer);
 			strmh->transfers[transfer_id] = transfer;
 			strmh->transfer_bufs[transfer_id] = malloc(total_transfer_size);
+			MARK("transfer_id = %d, total_transfer_size = %d, packets_per_transfer = %d, transfer_bufs[transfer_id] = %08X",
+				transfer_id, total_transfer_size, packets_per_transfer, strmh->transfer_bufs[transfer_id]);
 
 			libusb_fill_iso_transfer(transfer, strmh->devh->usb_devh,
 				format_desc->parent->bEndpointAddress,

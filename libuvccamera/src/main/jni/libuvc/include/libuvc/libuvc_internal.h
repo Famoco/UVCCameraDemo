@@ -14,7 +14,7 @@
 #include "utilbase.h"
 #include "utlist.h"
 
-//#define UVC_DEBUGGING
+#define UVC_DEBUGGING
 
 /** Converts an unaligned 8-byte little-endian integer into an int64 */
 #define QW_TO_LONG(p) \
@@ -68,13 +68,15 @@
     (out) = dl_nth_p; \
   } while (0);
 
+#define UVC_DEBUGGING
+
 #ifdef UVC_DEBUGGING
 #include <libgen.h>
 #ifdef __ANDROID__	// add for android saki@sereneginat
-	#define UVC_DEBUG(...) LOGD(__VA_ARGS__)
-	#define UVC_ENTER() LOGD("[%s:%d] begin %s", basename(__FILE__), __LINE__, __FUNCTION__)
-	#define UVC_EXIT(code) LOGD("[%s:%d] end %s (%d)", basename(__FILE__), __LINE__, __FUNCTION__, code)
-	#define UVC_EXIT_VOID() LOGD("[%s:%d] end %s", basename(__FILE__), __LINE__, __FUNCTION__)
+	#define UVC_DEBUG(FMT, ...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "[%s:%d:%s]:" FMT, basename(__FILE__), __LINE__, __FUNCTION__, ## __VA_ARGS__)
+	#define UVC_ENTER() __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "[%s:%d] begin %s", basename(__FILE__), __LINE__, __FUNCTION__)
+	#define UVC_EXIT(code) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "[%s:%d] end %s (%d)", basename(__FILE__), __LINE__, __FUNCTION__, code)
+	#define UVC_EXIT_VOID() __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "[%s:%d] end %s", basename(__FILE__), __LINE__, __FUNCTION__)
 #else
 	#define UVC_DEBUG(format, ...) fprintf(stderr, "[%s:%d/%s] " format "\n", basename(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
 	#define UVC_ENTER() fprintf(stderr, "[%s:%d] begin %s\n", basename(__FILE__), __LINE__, __FUNCTION__)
@@ -244,7 +246,7 @@ typedef struct uvc_device_info {
   We could/should change this to allow reduce it to, say, 5 by default
   and then allow the user to change the number of buffers as required.
  */
-#define LIBUVC_NUM_TRANSFER_BUFS 5
+#define LIBUVC_NUM_TRANSFER_BUFS 8
 
 #define LIBUVC_XFER_BUF_SIZE	( 16 * 1024 * 1024 )
 

@@ -1559,7 +1559,8 @@ void uvc_process_status_xfer(uvc_device_handle_t *devh,
 
 	UVC_ENTER();
 
-	/* printf("Got transfer of aLen = %d\n", transfer->actual_length); */
+	UVC_DEBUG("Got transfer: actual_length = %d, num_iso_packets=%d, length=%d\n",
+	    transfer->actual_length, transfer->num_iso_packets, transfer->length);
 
 	if (transfer->actual_length < 4) {
 		UVC_DEBUG("Short read of status update (%d bytes)", transfer->actual_length);

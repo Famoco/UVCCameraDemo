@@ -29,7 +29,7 @@
 #include "UVCPreview.h"
 #include "libuvc_internal.h"
 
-#define	LOCAL_DEBUG 0
+#define	LOCAL_DEBUG 1
 #define MAX_FRAME 4
 #define PREVIEW_PIXEL_BYTES 4	// RGBA/RGBX
 #define FRAME_POOL_SZ MAX_FRAME + 2
@@ -515,6 +515,16 @@ void UVCPreview::do_preview(uvc_stream_ctrl_t *ctrl) {
 				frame_mjpeg = waitPreviewFrame();
 				if (LIKELY(frame_mjpeg)) {
 					frame = get_frame(frame_mjpeg->width * frame_mjpeg->height * 2);
+                    LOGI("Streaming MJPEG: size=%d, width=%d, height=%d, format=%d, step=%d, sequence=%d",
+                        frame_mjpeg->data_bytes, frame_mjpeg->width, frame_mjpeg->height, frame_mjpeg->frame_format, frame_mjpeg->step, frame_mjpeg->sequence);
+
+                    if (frame_mjpeg->frame_format == UVC_FRAME_FORMAT_MJPEG)
+                        LOGI("Streaming MJPEG: frame_mjpeg->frame_format = UVC_FRAME_FORMAT_MJPEG");
+                    else if (frame_mjpeg->frame_format == UVC_FRAME_FORMAT_RGBX)
+                        LOGI("Streaming MJPEG: frame_mjpeg->frame_format = UVC_FRAME_FORMAT_RGBX");
+                    else
+                        LOGI("Streaming MJPEG: frame_mjpeg->frame_format = ?");
+
 					result = uvc_mjpeg2yuyv(frame_mjpeg, frame);   // MJPEG => yuyv
 					recycle_frame(frame_mjpeg);
 					if (LIKELY(!result)) {
@@ -529,6 +539,9 @@ void UVCPreview::do_preview(uvc_stream_ctrl_t *ctrl) {
 			// yuvyv mode
 			for ( ; LIKELY(isRunning()) ; ) {
 				frame = waitPreviewFrame();
+                LOGI("Streaming YUV: size=%d, width=%d, height=%d, format=%d, step=%d, sequence=%d",
+                    frame->data_bytes, frame->width, frame->height, frame->frame_format, frame->step, frame->sequence);
+
 				if (LIKELY(frame)) {
 					frame = draw_preview_one(frame, &mPreviewWindow, uvc_any2rgbx, 4);
 					addCaptureFrame(frame);
